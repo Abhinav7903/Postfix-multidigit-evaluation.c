@@ -1,0 +1,116 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include<ctype.h>
+#include <math.h>
+struct stack
+{
+    int size;
+    int top;
+    int *arr;
+};
+
+int stackTop(struct stack* sp){
+    return sp->arr[sp->top];
+}
+
+int isEmpty(struct stack *ptr)
+{
+    if (ptr->top == -1)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int isFull(struct stack *ptr)
+{
+    if (ptr->top == ptr->size - 1)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+int flag=0;
+
+void push(struct stack* ptr, int val){
+    if(isFull(ptr)){
+        printf("Stack Overflow! Cannot push %d to the stack\n", val);
+    }
+    else{
+        ptr->top++;
+        ptr->arr[ptr->top] = val;
+    }
+}
+
+int pop(struct stack* ptr){
+    if(isEmpty(ptr)){
+        printf("Stack Underflow! Cannot pop from the stack\n");
+        return -1;
+    }
+    else{
+        int val = ptr->arr[ptr->top];
+        ptr->top--;
+        return val;
+    }
+}
+
+int postfixEval(char* exp){
+    struct stack * sp = (struct stack *) malloc(sizeof(struct stack));
+    sp->size = 20;
+    sp->top = -1;
+    sp->arr = (int *) malloc(sp->size * sizeof(int));
+    int i;
+    double topElement;
+    double secondElement;
+    for ( i = 0; exp[i]; ++i)
+    {
+        if (exp[i]==' ')
+            continue;
+        else if (isdigit(exp[i]))
+        {
+            int num=0;
+            //extract full number
+            while(isdigit(exp[i]))
+            {
+                num=num*10+(int)(exp[i]-'0');
+                i++;                          
+            }
+            i--;
+            push(sp,num);
+        }
+
+        else{
+                topElement=pop(sp);
+                secondElement=pop(sp);
+                double result;
+            switch(exp[i]){
+
+                case'+':result=secondElement+topElement;break;
+                case'-':result=secondElement-topElement;break;
+                case'*':result=secondElement*topElement;break;
+                case'/':result=secondElement/topElement;break;
+                case'^':result=pow(secondElement,topElement);break;
+
+            }
+            push(sp,(int)result);
+        }
+    }
+    return pop(sp);
+}
+
+int main(){
+    char exp[1000];
+    for(;;){
+        printf("\nEnter the postfix expresion to evaluate: ");
+        gets(exp);
+        printf("postfixEval: %d",postfixEval(exp));
+    }
+    return 0;
+}
